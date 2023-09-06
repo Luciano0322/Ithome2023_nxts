@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 interface RickandmortyCharacter {
@@ -38,17 +39,29 @@ interface PageInfo {
   loading: boolean;
 }
 
-export default function Home() {
+// SSG透過props的方式將處理玩的data塞回component來使用
+export default function Home({ apiData }: { apiData: RickandmortyCharacterRes }) {
+  // CSR
   // 基本上都和你寫react沒有區別
   // const [count, setCount] = useState<number>(0);
+  // const [pageInfo, setPageInfo] = useState<PageInfo>({
+  //   pageUrl:'https://rickandmortyapi.com/api/character',
+  //   next: null,
+  //   prev: null,
+  //   loading: true,
+  //   curr: 0
+  // });
+
+  // if(!apiData) return (<h1>api 掛了</h1>);
+
   const [pageInfo, setPageInfo] = useState<PageInfo>({
     pageUrl:'https://rickandmortyapi.com/api/character',
-    next: null,
-    prev: null,
-    loading: true,
+    next: apiData.info.next,
+    prev: apiData.info.prev,
+    loading: false,
     curr: 0
   });
-  const [resData, setResData] = useState<RickandmortyCharacterRes|null>(null)
+  const [resData, setResData] = useState<RickandmortyCharacterRes>(apiData)
   const chkResData = useMemo(() => resData ,[resData])
   const pageChange = useCallback((status: string) => {
     // console.log(pageInfo);
@@ -87,25 +100,25 @@ export default function Home() {
       });
     }
   }, [pageInfo])
-  
-  useEffect(() => {
-    if(!chkResData) {
-      const controller = new AbortController();
-      const signal = controller.signal;
-      setPageInfo(pre => ({...pre, loading: true}));
-      fetch(pageInfo.pageUrl, {
-        signal: signal
-      })
-      .then((response) => response.json())
-      .then((response: RickandmortyCharacterRes) => {
-        const info = response.info
-        // console.log(info);
-        setResData(response)
-        setPageInfo(pre => ({...pre, next: info.next, prev: info.prev, loading: false}))
-      });
-      return () => controller.abort();
-    }
-  }, [pageInfo.pageUrl, chkResData])
+  // 透過SSG處理fetching data的動作可以降低useFootGun的問題
+  // useEffect(() => {
+  //   if(!chkResData) {
+  //     const controller = new AbortController();
+  //     const signal = controller.signal;
+  //     setPageInfo(pre => ({...pre, loading: true}));
+  //     fetch(pageInfo.pageUrl, {
+  //       signal: signal
+  //     })
+  //     .then((response) => response.json())
+  //     .then((response: RickandmortyCharacterRes) => {
+  //       const info = response.info
+  //       // console.log(info);
+  //       setResData(response)
+  //       setPageInfo(pre => ({...pre, next: info.next, prev: info.prev, loading: false}))
+  //     });
+  //     return () => controller.abort();
+  //   }
+  // }, [pageInfo.pageUrl, chkResData])
   return (
     <main className="container mx-auto">
       <h2>這裡會是首頁主要內容</h2>
@@ -132,10 +145,38 @@ export default function Home() {
           disabled={pageInfo.next===null || pageInfo.loading}>next</button>
       </div>
       {resData?.results?.map((character) => (
-        <div key={character.id}>
-          {character.name}
+        <div className="flex items-center w-full my-2 p-4 shadow-xl rounded-lg" key={character.id}>
+          <div className="">
+            <Image src={character.image} alt={character.name} width={100} height={100}/>
+          </div>
+          <div>
+            <p>{character.name}</p>
+          </div>
         </div>
       ))}
+        
     </main>
   )
+}
+
+// 下面是改用SSG的操作
+// 透過getStaticProps來處理fetching data的問題
+export async function getStaticProps() {
+  // 這裡已經處理default值
+  try{
+    const res = await fetch("https://rickandmortyapi.com/api/character");
+    // 我懶得處理error page原諒我先用next原生的頁面
+    if (!res.ok) {
+      return { notFound: true };
+    }
+    const apiData: RickandmortyCharacterRes = await res.json();
+    return {
+      props: {
+        apiData,
+      },
+      revalidate: 10,
+    };
+  } catch(err) {
+    console.log('err',err);
+  }
 }
