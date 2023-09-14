@@ -1,7 +1,8 @@
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react"
 
-interface RickandmortyCharacter {
+export interface RickandmortyCharacter {
   id: number,
   name: string,
   status: string,
@@ -59,7 +60,7 @@ export default function Home({ apiData }: { apiData: RickandmortyCharacterRes })
     next: apiData.info.next,
     prev: apiData.info.prev,
     loading: false,
-    curr: 0
+    curr: 1
   });
   const [resData, setResData] = useState<RickandmortyCharacterRes>(apiData)
   const chkResData = useMemo(() => resData ,[resData])
@@ -151,6 +152,7 @@ export default function Home({ apiData }: { apiData: RickandmortyCharacterRes })
           </div>
           <div>
             <p>{character.name}</p>
+            <Link href={`/characters/${character.id}`}>{character.id}</Link>
           </div>
         </div>
       ))}
