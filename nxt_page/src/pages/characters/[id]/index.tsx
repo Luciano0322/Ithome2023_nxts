@@ -46,6 +46,10 @@ const Character: React.FC<CharacterProps> = ({roleDetail}) => {
         <p>origin: {roleDetail?.origin.name}</p>
         <p>location: {roleDetail?.location.name}</p>
       </div>
+      <button 
+        className="p-2 mx-2 rounded-lg shadow-md bg-blue-500 hover:bg-blue-300 disabled:bg-gray-100 min-w-40"
+        onClick={() => router.back()}
+      >back</button>
     </div>
   )
 }

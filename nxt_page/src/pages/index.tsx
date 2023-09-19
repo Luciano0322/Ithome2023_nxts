@@ -1,3 +1,4 @@
+import Header from "@/components/Header";
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react"
@@ -32,7 +33,7 @@ interface RickandmortyCharacterRes {
   results: RickandmortyCharacter[]
 }
 
-interface PageInfo {
+export interface PageInfo {
   pageUrl: string;
   next: string | null;
   prev: string | null;
@@ -122,7 +123,7 @@ export default function Home({ apiData }: { apiData: RickandmortyCharacterRes })
   // }, [pageInfo.pageUrl, chkResData])
   return (
     <main className="container mx-auto">
-      <h2>這裡會是首頁主要內容</h2>
+      <Header/>
       {/* <div className="flex justify-center items-center">
         <button 
           className="p-2 mx-2 rounded-lg shadow-md bg-blue-500 hover:bg-blue-300 disabled:bg-gray-100 min-w-40"
