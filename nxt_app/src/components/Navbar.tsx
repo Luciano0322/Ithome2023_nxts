@@ -7,6 +7,7 @@ const Navbar = () => {
       <div><Link href={`/`}>home</Link></div>
       <ul className="flex items-center">
         <li className="mx-4 bg-white rounded-lg p-2 shadow-sm"><Link href={`/charas`}>角色</Link></li>
+        <li className="mx-4 bg-white rounded-lg p-2 shadow-sm"><Link href={`/searchCharas`}>搜尋角色</Link></li>
         <li className="mx-4 bg-white rounded-lg p-2 shadow-sm"><Link href={`/locations`}>地點</Link></li>
       </ul>
     </nav>
